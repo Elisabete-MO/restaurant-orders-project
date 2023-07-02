@@ -44,14 +44,12 @@ def test_dish_not_eq():
     assert dish1 != dish2
 
 
-@pytest.mark.xfail(strict=True)
 def test_dish_hash_equal():
     dish1 = Dish("Lasagna", 25.0)
     dish2 = Dish("Lasagna", 25.0)
     assert hash(dish1) == hash(dish2)
 
 
-@pytest.mark.xfail(strict=True)
 def test_dish_hash_not_equal():
     dish1 = Dish("Lasagna", 25.0)
     dish2 = Dish("Spaghetti", 15.0)
@@ -60,49 +58,50 @@ def test_dish_hash_not_equal():
 
 def test_dish_add_ingredient_dependency():
     dish = Dish("Lasagna", 25.0)
-    ingredient = Ingredient("cheese")
+    ingredient = Ingredient("farinha")
     dish.add_ingredient_dependency(ingredient, 2)
-    assert dish.recipe[ingredient] == 2
+    assert dish.recipe == {ingredient: 2}
 
 
 def test_dish_invalid_price_type():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="Dish price must be float."):
         Dish("Lasagna", "25.0")
 
 
 def test_dish_invalid_price_value():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError,
+                       match="Dish price must be greater then zero."):
         Dish("Lasagna", -10.0)
 
 
 def test_dish_recipe_get_quantity():
     dish = Dish("Lasagna", 25.0)
-    ingredient = Ingredient("cheese")
+    ingredient = Ingredient("farinha")
     dish.add_ingredient_dependency(ingredient, 2)
     assert dish.recipe.get(ingredient) == 2
 
 
 def test_dish_get_restrictions():
     dish = Dish("Lasagna", 25.0)
-    ingredient1 = Ingredient("cheese")
-    ingredient2 = Ingredient("tomato")
-    ingredient3 = Ingredient("beef")
+    ingredient1 = Ingredient("farinha")
+    ingredient2 = Ingredient("tomate")
+    ingredient3 = Ingredient("queijo mussarela")
     dish.add_ingredient_dependency(ingredient1, 2)
     dish.add_ingredient_dependency(ingredient2, 3)
     dish.add_ingredient_dependency(ingredient3, 1)
-    expected_restrictions = {
+    expected_restrictions = set().union(
         ingredient1.restrictions,
         ingredient2.restrictions,
         ingredient3.restrictions,
-    }
+    )
     assert dish.get_restrictions() == expected_restrictions
 
 
 def test_dish_get_ingredients():
     dish = Dish("Lasagna", 25.0)
-    ingredient1 = Ingredient("cheese")
-    ingredient2 = Ingredient("tomato")
-    ingredient3 = Ingredient("beef")
+    ingredient1 = Ingredient("farinha")
+    ingredient2 = Ingredient("tomate")
+    ingredient3 = Ingredient("queijo mussarela")
     dish.add_ingredient_dependency(ingredient1, 2)
     dish.add_ingredient_dependency(ingredient2, 3)
     dish.add_ingredient_dependency(ingredient3, 1)
